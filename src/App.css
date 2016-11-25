@@ -1,0 +1,58 @@
+.Clock {
+  position: relative;
+}
+
+.Clock .cityName {
+  padding: 15px 0;
+  text-align: center;
+}
+
+.Clocks {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.AddCity {
+  width: 220px;
+  height: 220px;
+  border: 2px dashed #888;
+  border-radius: 200px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.AddCity > * {
+  text-align: center;
+  color: #080;
+  text-shadow: 0px 0px 4px #8f8;
+}
+
+.RemoveCity {
+  position: absolute;
+  right: 0;
+  color: #800;
+  text-shadow: 0px 0px 4px #f88;
+}
+
+.EditingSwitch {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: white;
+  padding: 4px 12px;
+  border-top-left-radius: 4px;
+  box-shadow: -1px -1px 4px gray;
+}
+
+.EditingSwitch[mode=editing] {
+  background-color: #f88;
+  color: #800;
+}
+
+.EditingSwitch[mode=viewing] {
+  background-color: #8f8;
+  color: #080;
+}
