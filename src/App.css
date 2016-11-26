@@ -40,15 +40,15 @@
 
 .AddCity > * {
   text-align: center;
-  color: #080;
-  text-shadow: 0px 0px 4px #8f8;
+  color: #8f8;
+  text-shadow: 0px 0px 4px #484;
 }
 
 .RemoveCity {
   position: absolute;
   right: 0;
-  color: #800;
-  text-shadow: 0px 0px 4px #f88;
+  color: #f88;
+  text-shadow: 0px 0px 4px #844;
 }
 
 .EditingSwitch {
