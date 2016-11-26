@@ -46,7 +46,7 @@ export default class Store extends EventEmitter {
     let hash = window.location.hash.replace(/^#/, '');
     if (hash) {
       try {
-        Object.assign(this.state, JSON.parse(hash));
+        Object.assign(this.state, JSON.parse(atob(hash)));
       } catch(e) {
         console.log("Bad hash:", hash);
         window.location.hash = '';
@@ -95,7 +95,10 @@ export default class Store extends EventEmitter {
       this.state.cities = ['San Francisco'];
     }
     if (!this.state.clockTheme) {
-      this.state.clockTheme = 'light';
+      this.state.clockTheme = CLOCK_THEMES[0];
+    }
+    if (!this.state.backgroundTheme) {
+      this.state.backgroundTheme = BACKGROUND_THEMES[0];
     }
   }
 
@@ -118,7 +121,7 @@ export default class Store extends EventEmitter {
     const hashState = Object.assign({}, this.state);
     delete hashState.editing;
     delete hashState.enableEditing;
-    window.location.hash = JSON.stringify(hashState);
+    window.location.hash = btoa(JSON.stringify(hashState));
     if (this.postUrlChanges) {
       window.parent.postMessage({
         message: 'widget-edited',
