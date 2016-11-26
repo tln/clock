@@ -30,38 +30,73 @@ function successor(list, item) {
   return list[(list.indexOf(item)+1)%list.length];
 }
 
+// stores state in hash.
+// provides abstractions over the state.
+// When in an iframe, editing is disabled unless a message
+// is posted to the window.
 export default class Store extends EventEmitter {
   emitChange() {
     this.emit('change', this.state);
   }
 
-  // stores state in hash.
-  // provides abstractions over the state.
   constructor() {
     super();
     this.state = {};
+    this.initFrameProtocol();
     let hash = window.location.hash.replace(/^#/, '');
     if (hash) {
       try {
-        this.setNewState(JSON.parse(hash));
+        Object.assign(this.state, JSON.parse(hash));
       } catch(e) {
         console.log("Bad hash:", hash);
         window.location.hash = '';
-        this.setNewState({});
       }
-    } else {
-      this.setNewState({});
+    }
+    this.setDefaults();
+  }
+
+  initFrameProtocol() {
+    this.postUrlChanges = false;
+    this.state = {enableEditing: this.isTopWindow()};
+    this.listenToPostMessage();
+  }
+
+  isTopWindow() {
+    try {
+      return window.parent === window;
+    } catch(e) {
+      // If we get an access violation, we can't be top window.
+      return false;
     }
   }
 
-  setNewState(newState) {
-    if (!newState.cities) {
-      newState.cities = ['San Francisco'];
+  listenToPostMessage() {
+    if (!this.isTopWindow()) {
+      // enable editing protocol:
+      // 1. send message to parent with data {message:'widget-edit-enabled'}
+      // 2. listen for message from parent with {message:'enable-widget-edit'}
+      // 3. send messages to parent with {message:'widget-edited',url:...}
+      window.addEventListener('message', (event) =>{
+        console.log("message", event.data);
+        if (event.data.message === 'enable-widget-edit') {
+          // Enable editing
+          this.state.enableEditing = true;
+          this.postUrlChanges = true;
+          this.emitChange();
+          this.updateHash();
+        }
+      });
+      window.parent.postMessage({message:'widget-edit-enabled'}, '*');
     }
-    if (!newState.clockTheme) {
-      newState.clockTheme = 'light';
+  }
+
+  setDefaults() {
+    if (!this.state.cities) {
+      this.state.cities = ['San Francisco'];
     }
-    this.state = newState;
+    if (!this.state.clockTheme) {
+      this.state.clockTheme = 'light';
+    }
   }
 
   addCity(cityName) {
@@ -80,7 +115,16 @@ export default class Store extends EventEmitter {
   }
 
   updateHash() {
-    window.location.hash = JSON.stringify(this.state);
+    const hashState = Object.assign({}, this.state);
+    delete hashState.editing;
+    delete hashState.enableEditing;
+    window.location.hash = JSON.stringify(hashState);
+    if (this.postUrlChanges) {
+      window.parent.postMessage({
+        message: 'widget-edited',
+        url: window.location+''
+      }, '*');
+    }
   }
 
   availableCities() {

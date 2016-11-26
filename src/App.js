@@ -24,7 +24,9 @@ class App extends Component {
   }
 
   render() {
-    const {editing, cities, clockTheme, backgroundTheme} = this.state;
+    const {
+      editing, cities, clockTheme, backgroundTheme, enableEditing
+    } = this.state;
     const {store} = this.props;
     const context = {editing, store};
     appEditing = editing;  // update wrapper state
@@ -36,7 +38,7 @@ class App extends Component {
           )}
           {editing ? <AddCity {...context}/> : []}
         </div>
-        <EditingSwitch {...context}/>
+        {enableEditing ? <EditingSwitch {...context}/> : []}
       </div>
     );
   }
