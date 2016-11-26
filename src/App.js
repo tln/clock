@@ -14,14 +14,14 @@ class App extends Component {
   }
 
   render() {
-    const {editing, cities} = this.state;
+    const {editing, cities, clockTheme} = this.state;
     const {store} = this.props;
     const context = {editing, store};
     return (
       <div>
         <div className="Clocks">
           {cities.map((city) =>
-            <Clock {...context} city={store.cityInfo(city)} width="200" theme={Themes.light} />
+            <Clock {...context} city={store.cityInfo(city)} width="200" theme={Themes[clockTheme||'light']} />
           )}
           {editing ? <AddCity {...context}/> : []}
         </div>
@@ -55,7 +55,12 @@ function Clock(props) {
   let { city, editing } = props;
   let date = dateAtTimezone(city.tz);
   console.log(date, props);
-  return <div className="Clock">
+  function onClick() {
+    if (editing) {
+      props.store.nextClockTheme();
+    }
+  }
+  return <div onClick={onClick} className="Clock">
     {editing ? <RemoveCity {...props} /> : []}
     <AnalogClock date={date} {...props} />
     <div className="cityName">{city.name}</div>

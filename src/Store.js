@@ -12,6 +12,15 @@ const CITIES = {
   'Tokyo': 'Asia/Tokyo',
 }
 
+const CLOCK_THEMES = [
+  'light',
+  'dark',
+  'aqua',
+  'lime',
+  'sherbert',
+  'navy',
+]
+
 export default class Store extends EventEmitter {
   emitChange() {
     this.emit('change', this.state);
@@ -40,6 +49,9 @@ export default class Store extends EventEmitter {
     if (!newState.cities) {
       newState.cities = ['San Francisco'];
     }
+    if (!newState.clockTheme) {
+      newState.clockTheme = 'light';
+    }
     this.state = newState;
   }
 
@@ -63,7 +75,7 @@ export default class Store extends EventEmitter {
   }
 
   availableCities() {
-    return Object.keys(CITIES).filter((city) => this.state.cities.indexOf(city) == -1);
+    return Object.keys(CITIES).filter((city) => this.state.cities.indexOf(city) === -1);
   }
 
   cityInfo(city) {
@@ -72,6 +84,14 @@ export default class Store extends EventEmitter {
 
   setEditingMode(editing) {
     this.state.editing = editing;
+    this.emitChange();
+    this.updateHash();
+  }
+
+  nextClockTheme() {
+    const index = CLOCK_THEMES.indexOf(this.state.clockTheme);
+    const newTheme = CLOCK_THEMES[(index+1)%CLOCK_THEMES.length];
+    this.state.clockTheme = newTheme;
     this.emitChange();
     this.updateHash();
   }
