@@ -3,6 +3,16 @@ import AnalogClock, { Themes } from 'react-analog-clock';
 import { dateAtTimezone } from './tz';
 import './App.css';
 
+// Wraps event handler, calls iff editing is set.
+// Stops event propogation.
+var appEditing;
+function editHandler(func) {
+  return (event) => {
+    event.stopPropagation();
+    if (appEditing) func();
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -14,12 +24,13 @@ class App extends Component {
   }
 
   render() {
-    const {editing, cities, clockTheme} = this.state;
+    const {editing, cities, clockTheme, backgroundTheme} = this.state;
     const {store} = this.props;
     const context = {editing, store};
+    appEditing = editing;  // update wrapper state
     return (
       <div>
-        <div className="Clocks">
+        <div onClick={editHandler(() => store.nextBackgroundTheme())} className={`Clocks theme-${backgroundTheme}`}>
           {cities.map((city) =>
             <Clock {...context} city={store.cityInfo(city)} width="200" theme={Themes[clockTheme||'light']} />
           )}
@@ -33,21 +44,24 @@ class App extends Component {
 
 function EditingSwitch(props) {
   return <div className="EditingSwitch" mode={props.editing ? 'editing' : 'viewing'}
-    onClick={() => props.store.setEditingMode(!props.editing)}
+    onClick={(event) => {
+      event.stopPropagation();
+      props.store.setEditingMode(!props.editing);
+    }}
   >{props.editing ? 'Done' : 'Edit'}</div>
 }
 
 function AddCity(props) {
   return <div className="AddCity">
       {props.store.availableCities().map((city) =>
-        <div onClick={() => props.store.addCity(city)}>{city}</div>
+        <div onClick={editHandler(() => props.store.addCity(city))}>{city}</div>
       )}
     </div>;
 }
 
 function RemoveCity(props) {
   return <div className="RemoveCity"
-    onClick={() => props.store.removeCity(props.city.name)}
+    onClick={editHandler(() => props.store.removeCity(props.city.name))}
   >&#10006;</div>;
 }
 
@@ -55,12 +69,7 @@ function Clock(props) {
   let { city, editing } = props;
   let date = dateAtTimezone(city.tz);
   console.log(date, props);
-  function onClick() {
-    if (editing) {
-      props.store.nextClockTheme();
-    }
-  }
-  return <div onClick={onClick} className="Clock">
+  return <div onClick={editHandler(() => props.store.nextClockTheme())} className="Clock">
     {editing ? <RemoveCity {...props} /> : []}
     <AnalogClock date={date} {...props} />
     <div className="cityName">{city.name}</div>

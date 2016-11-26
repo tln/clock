@@ -21,6 +21,15 @@ const CLOCK_THEMES = [
   'navy',
 ]
 
+const BACKGROUND_THEMES = [
+  'light',
+  'dark'
+]
+
+function successor(list, item) {
+  return list[(list.indexOf(item)+1)%list.length];
+}
+
 export default class Store extends EventEmitter {
   emitChange() {
     this.emit('change', this.state);
@@ -89,9 +98,13 @@ export default class Store extends EventEmitter {
   }
 
   nextClockTheme() {
-    const index = CLOCK_THEMES.indexOf(this.state.clockTheme);
-    const newTheme = CLOCK_THEMES[(index+1)%CLOCK_THEMES.length];
-    this.state.clockTheme = newTheme;
+    this.state.clockTheme = successor(CLOCK_THEMES, this.state.clockTheme);
+    this.emitChange();
+    this.updateHash();
+  }
+
+  nextBackgroundTheme() {
+    this.state.backgroundTheme = successor(BACKGROUND_THEMES, this.state.backgroundTheme);
     this.emitChange();
     this.updateHash();
   }

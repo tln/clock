@@ -73,3 +73,11 @@
   background-color: #8f8;
   color: #080;
 }
+
+
+.Clocks.theme-dark {
+  background: #444;
+}
+.Clocks.theme-dark .cityName {
+  color: white;
+}
