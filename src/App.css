@@ -9,8 +9,22 @@
 
 .Clocks {
   display: flex;
+  height: 100vh;
+  align-items: center;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
+}
+
+/* Spacer elements so that there is even space on left and right */
+.Clocks::before {
+  content: "";
+  display: block;
+  width: 0;
+}
+.Clocks::after {
+  content: "";
+  display: block;
+  width: 0;
 }
 
 .AddCity {
@@ -45,6 +59,9 @@
   padding: 4px 12px;
   border-top-left-radius: 4px;
   box-shadow: -1px -1px 4px gray;
+  font-size: x-small;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .EditingSwitch[mode=editing] {
